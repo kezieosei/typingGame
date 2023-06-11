@@ -40,8 +40,23 @@ def delete_record(record_id):
             database.remove(record)
             save_database()
             break
+def display_record(identifier):
+     for record in database:
+        if record['score'] == identifier:
+            print(record)
+            break
+def print_leaderboard():
+     sorted_data = sorted(database, key=lambda x: x["score"], reverse=True)
 
-def game( ):
+    # Get the names and scores of the top 5 scores
+     top_5_names_scores = [(item["name"], item["score"]) for item in sorted_data[:5]]
+     print("---------------------LEADERBOARD--------------------")
+    # Display the names and scores of the top 5 scores
+     for name, score in top_5_names_scores:
+        print(f"{name}: {score}")
+
+    
+def game():
    
         
     # Game setup 
@@ -50,7 +65,7 @@ def game( ):
     words = ['apple', 'banana', 'orange', 'grape', 'mango']  # List of words for the game
     score = 0  # Player's score
     start_time = time.time()  # Start time for tracking the duration of the game
-    total_time = 10  # Total duration of the game in seconds
+    total_time = 1 # Total duration of the game in seconds
 
     # Game loop
     #while time.time() - start_time < total_time :
@@ -93,7 +108,8 @@ x = read_records()
    # print(read_records())
     
 
-#print(read_records())
+# print(read_records())
+# print_leaderboard()
   
 
 game()
