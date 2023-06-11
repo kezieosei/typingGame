@@ -40,34 +40,30 @@ def delete_record(record_id):
             database.remove(record)
             save_database()
             break
-def display_record(identifier):
-     for record in database:
-        if record['score'] == identifier:
-            print(record)
-            break
-def print_leaderboard():
-     sorted_data = sorted(database, key=lambda x: x["score"], reverse=True)
 
-    # Get the names and scores of the top 5 scores
-     top_5_names_scores = [(item["name"], item["score"]) for item in sorted_data[:5]]
-     print("---------------------LEADERBOARD--------------------")
-    # Display the names and scores of the top 5 scores
-     for name, score in top_5_names_scores:
-        print(f"{name}: {score}")
-
-    
-def game():
+def game( ):
    
         
     # Game setup 
     name = input('Enter name \n>>')
+    
     words = ['apple', 'banana', 'orange', 'grape', 'mango']  # List of words for the game
     score = 0  # Player's score
     start_time = time.time()  # Start time for tracking the duration of the game
     total_time = 1 # Total duration of the game in seconds
 
     # Game loop
-    while time.time() - start_time < total_time:
+    #while time.time() - start_time < total_time :
+    while True:
+
+        if time.time() - start_time >= total_time:
+            print("Game Over")
+            print("Final score:", score)
+            break
+        else:
+             print("Time remaining:", total_time - (time.time() - start_time), "seconds")
+
+
         target_word = random.choice(words)  # Select a random word from the list
         print("Type the word:", target_word)
         user_input = input()
@@ -79,12 +75,26 @@ def game():
             print("Incorrect!")
 
         print("Score:", score)
-        print("Time remaining:", total_time - (time.time() - start_time), "seconds")
+        if (time.time() - start_time) < 0:
+            print("Game Over")
+            break
+       
 
-    print("Game over!")
-    print("Final score:", score)
-    create_record({'name': name, 'score': score } )
-    print_leaderboard()
+    #print("Game over!")
+   # print("Final score:", score)
+    
+    create_record({'name': name, 'score': score })
+   #update_record
+x = read_records()
+   # for entry in x:
+       # print(entry)
+        # y = json.loads(str(entry))
+        # print(y['name'])
+   # print(read_records())
+    
+
+#print(read_records())
+  
 
 game()
-
+# 0add leaderboard
