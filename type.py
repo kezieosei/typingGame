@@ -101,6 +101,7 @@ def game():
     create_record({'name': name, 'score': score })
    #update_record
 x = read_records()
+print_leaderboard()
    # for entry in x:
        # print(entry)
         # y = json.loads(str(entry))
