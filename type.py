@@ -86,12 +86,5 @@ def game():
     create_record({'name': name, 'score': score } )
     print_leaderboard()
 
-    
-
-
-# print(read_records())
-# print_leaderboard()
-  
-
 game()
-# 0add leaderboard
+
