@@ -61,24 +61,13 @@ def game():
         
     # Game setup 
     name = input('Enter name \n>>')
-    
     words = ['apple', 'banana', 'orange', 'grape', 'mango']  # List of words for the game
     score = 0  # Player's score
     start_time = time.time()  # Start time for tracking the duration of the game
     total_time = 1 # Total duration of the game in seconds
 
     # Game loop
-    #while time.time() - start_time < total_time :
-    while True:
-
-        if time.time() - start_time >= total_time:
-            print("Game Over")
-            print("Final score:", score)
-            break
-        else:
-             print("Time remaining:", total_time - (time.time() - start_time), "seconds")
-
-
+    while time.time() - start_time < total_time:
         target_word = random.choice(words)  # Select a random word from the list
         print("Type the word:", target_word)
         user_input = input()
@@ -114,4 +103,4 @@ print_leaderboard()
   
 
 game()
-# 0add leaderboard
+
