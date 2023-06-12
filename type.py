@@ -79,12 +79,28 @@ def game():
             print("Incorrect!")
 
         print("Score:", score)
-        print("Time remaining:", total_time - (time.time() - start_time), "seconds")
+        if (time.time() - start_time) < 0:
+            print("Game Over")
+            break
+       
+    #pls let me push my changes github
+    #print("Game over!")
+   # print("Final score:", score)
+    
+    create_record({'name': name, 'score': score })
+   #update_record
+x = read_records()
+print_leaderboard()
+   # for entry in x:
+       # print(entry)
+        # y = json.loads(str(entry))
+        # print(y['name'])
+   # print(read_records())
+    
 
-    print("Game over!")
-    print("Final score:", score)
-    create_record({'name': name, 'score': score } )
-    print_leaderboard()
+# print(read_records())
+# print_leaderboard()
+  
 
 game()
 
