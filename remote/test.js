@@ -24,67 +24,6 @@ admin.initializeApp({
 // Get a reference to the Realtime Database root node
 const db = admin.database();
 
-// // Function to send data to the database
-// function sendDataToDatabase(data) {
-//   // Generate a new key for the data
-//   const newKey = db.ref().push().key;
-
-//   // Create the data object
-//   const newData = {
-//     [newKey]: data
-//   };
-
-//   // Save the data to the database
-//   return db.ref().update(newData);
-// }
-
-// // Usage: node app.js "Data to send"
-// const dataToSend = process.argv[2];
-
-// if (!dataToSend) {
-//   console.error('No data provided. Please provide the data to send as a command-line argument.');
-// } else {
-//   sendDataToDatabase(dataToSend)
-//     .then(() => {
-//       console.log('Data sent successfully to the database.');
-//       process.exit(0);
-//     })
-//     .catch(error => {
-//       console.error('Error sending data to the database:', error);
-//       process.exit(1);
-//     });
-// }
-
-
-
-// // Create a simple database structure
-// const messagesRef = db.ref('messages');
-
-// // Method 1: Set Data
-// messagesRef.set({
-//   message1: {
-//     content: "Hello, World!",
-//     sender: "user123"
-//   },
-//   message2: {
-//     content: "Hi there!",
-//     sender: "user456"
-//   }
-// });
-
-// // Method 2: Update Data
-// const message1Ref = messagesRef.child('message1');
-// message1Ref.update({
-//   content: "Updated message content!"
-// });
-
-// // Method 3: Push Data with Auto-generated Keys
-// const usersRef = db.ref('users');
-// const newUserRef = usersRef.push();
-// newUserRef.set({
-//   name: "John Doe",
-//   email: "john@example.com"
-// });
 
 const leaderboardRef = db.ref('leaderboard');
 
@@ -92,7 +31,7 @@ const leaderboardRef = db.ref('leaderboard');
 function addUserToLeaderboard(username, score) {
   // Create a new unique key for the user
   const newUserRef = leaderboardRef.push();
-
+  
   // Set the data for the new user entry
   newUserRef.set({
     username: username,
@@ -101,30 +40,166 @@ function addUserToLeaderboard(username, score) {
 }
 
 // Function to get the leaderboard data (Top N scores)
+// Function to get the leaderboard data as an object (username as key, score as value)
+// Function to get the leaderboard data in descending order (highest score at the top)
 function getLeaderboard(topN) {
   // Query the leaderboard node to get the top N scores
   leaderboardRef.orderByChild('score').limitToLast(topN).once('value')
-    .then((snapshot) => {
-      // The snapshot contains the leaderboard data for the top N scores
-      const leaderboardData = snapshot.val();
-
-      // Process the leaderboard data as needed
-      console.log(leaderboardData);
+  .then((snapshot) => {
+    // The snapshot contains the leaderboard data for the top N scores
+    const leaderboardData = {};
+    
+    snapshot.forEach((childSnapshot) => {
+      const key = childSnapshot.key;
+      const { username, score } = childSnapshot.val();
+      leaderboardData[username] = score;
+    });
+    
+    // Sort the leaderboard data in descending order by score
+    const sortedLeaderboard = Object.fromEntries(
+      Object.entries(leaderboardData).sort((a, b) => b[1] - a[1])
+      );
+      
+      // Process the sorted leaderboard data as needed
+      console.log(sortedLeaderboard);
     })
     .catch((error) => {
       console.error('Error getting leaderboard data:', error);
     });
-}
+  }
+  
+  // Function to fetch random words from the API
+  const readline = require('readline');
+  const fetch = require('node-fetch');
+  
+  let words = [];
+  let timer;
+  let startTime;
+  let remainingSeconds = 60;
+  let correctCount = 0;
+  let incorrectCount = 0;
+  
+  // creating a function to get random words  TODO: specify the word length
+  async function fetchRandomWords() {
+    const apiUrl = 'https://random-word-api.vercel.app/api?words=10';
+  
+    try {
+      const response = await fetch(apiUrl);
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+  
+      return data;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return []; // Return an empty array in case of an error
+    }
+  }
+  // Main function - 
+  async function startGame() {
+    correctCount = 0;
+    incorrectCount = 0;
+  
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+  
+    rl.question("Enter your name: ", async (name) => {
+      name = name.trim();
+  
+      if (name === "") {
+        console.log("Please enter your name.");
+        rl.close();
+        return;
+      }
+  
+      console.log("Welcome to the Word Typing Game!");
+      console.log(`Hello, ${name}!`);
+      console.log("You have 60 seconds to type a word each time.");
+  
+      // Fetch random words from the API
+      words = await fetchRandomWords();
+  
+      // Start the timer
+      startTime = Date.now();
+      startTimer();
+  
+      // Prompt the user to type a word
+      getRandomWord(rl, name);
+    });
+  }
+  
+  function startTimer() {
+    timer = setInterval(() => {
+      const currentTime = Date.now();
+      const elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+      remainingSeconds = 60 - elapsedSeconds;
+  
+      if (remainingSeconds <= 0) {
+        clearInterval(timer);
+        console.log("Time's up!");
+        showScore();
+        process.exit(0);
+      }
+    }, 1000);
+  }
+  
+  async function getRandomWord(rl, name) {
+    const randomIndex = Math.floor(Math.random() * words.length);
+    const word = words[randomIndex];
+  
+    rl.question(`Time remaining: ${remainingSeconds} seconds\nType: ${word}\n`, async (userInput) => {
+      if (userInput.trim().toLowerCase() === word) {
+        console.log("Correct!");
+        correctCount++;
+      } else {
+        console.log("Wrong!");
+        incorrectCount++;
+      }
+  
+      words.splice(randomIndex, 1);
+  
+      if (words.length === 0) {
+        clearInterval(timer);
+        showScore(name);
+        process.exit(0);
+      }
+  
+      getRandomWord(rl, name);
+    });
+  }
+  // Display score and add to Realtime Firebase Database
+  function showScore(name) {
+    const score = correctCount;
+    console.log(`Game over, ${name}!`);
+    console.log(`Your score is: ${score}`);
+    addUserToLeaderboard(name, score);
+  }
+  
+  startGame();
+  
 
 
-// Example usage:
-// Add user scores to the leaderboard
-addUserToLeaderboard('User1', 100);
-addUserToLeaderboard('User2', 150);
-addUserToLeaderboard('User3', 80);
-
-// Get the top 5 scores from the leaderboard
-getLeaderboard(5);
-
-
-
+  
+  
+  
+  
+  
+  
+  
+  // Example usage:
+  // Add user scores to the leaderboard
+  // addUserToLeaderboard('User1', 100);
+  // addUserToLeaderboard('User2', 150);
+  // addUserToLeaderboard('User3', 80);
+  
+  // // Get the top 5 scores from the leaderboard
+  // getLeaderboard(5);
+  
+  
+  
+  
