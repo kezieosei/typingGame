@@ -7,6 +7,8 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 
+
+
 # Initialize the Firebase app
 cred = credentials.Certificate('C:\\Users\\dwwil\\Downloads\\type-b7473-firebase-adminsdk-kg7ox-a1279170b2.json')
 firebase_admin.initialize_app(cred, {
@@ -149,10 +151,6 @@ def game():
         time.sleep(REFRESH_INTERVAL* 7)
         print("<3")
     
-
-  
-
-
 game()
 display_leaderboard()
 
