@@ -119,7 +119,7 @@ function getLeaderboard(topN) {
   
       console.log("Welcome to the Word Typing Game!");
       console.log(`Hello, ${name}!`);
-      console.log("You have 60 seconds to type a word each time.");
+      
   
       // Fetch random words from the API
       words = await fetchRandomWords();
@@ -178,6 +178,7 @@ function getLeaderboard(topN) {
     console.log(`Game over, ${name}!`);
     console.log(`Your score is: ${score}`);
     addUserToLeaderboard(name, score);
+    
   }
   
   startGame();
